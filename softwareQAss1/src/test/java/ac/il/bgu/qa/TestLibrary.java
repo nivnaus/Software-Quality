@@ -112,12 +112,13 @@ public class TestLibrary {
         verify(mockDatabaseService, never()).addBook(anyString(), eq(mockBook));
     }
 
-    @Test
-    public void givenAuthorInvalid_whenAddBook_thenIllegalArgumentException() {
+    @ParameterizedTest
+    @ValueSource(strings = { "" , "1Coleen Hoover", "Coleen Hoover2", "Colleen--Hoover", "Coleen''hoover" ,"Coleen&hoover"})
+    public void givenAuthorInvalid_whenAddBook_thenIllegalArgumentException(String authorName) {
         Book mockBook = mock(Book.class);
         when(mockBook.getISBN()).thenReturn("9781501110368");
         when(mockBook.getTitle()).thenReturn("It ends with us");
-        when(mockBook.getAuthor()).thenReturn("");
+        when(mockBook.getAuthor()).thenReturn(authorName);
         IllegalArgumentException thrown = assertThrows(IllegalArgumentException.class, () -> {
             library.addBook(mockBook);
         });
@@ -127,6 +128,38 @@ public class TestLibrary {
         verify(mockDatabaseService, never()).getBookByISBN(anyString());
         verify(mockDatabaseService, never()).addBook(anyString(), eq(mockBook));
     }
+
+    @Test
+    public void givenAuthorNameNullInvalid_whenAddBook_thenIllegalArgumentException() {
+        Book mockBook = mock(Book.class);
+        when(mockBook.getISBN()).thenReturn("9781501110368");
+        when(mockBook.getTitle()).thenReturn("It ends with us");
+        when(mockBook.getAuthor()).thenReturn(null);
+        IllegalArgumentException thrown = assertThrows(IllegalArgumentException.class, () -> {
+            library.addBook(mockBook);
+        });
+
+        assertEquals("Invalid author.", thrown.getMessage());
+        verify(mockBook, never()).isBorrowed();
+        verify(mockDatabaseService, never()).getBookByISBN(anyString());
+        verify(mockDatabaseService, never()).addBook(anyString(), eq(mockBook));
+    }
+
+//    @Test
+//    public void givenAuthorNameWithNumbersInvalid_whenAddBook_thenIllegalArgumentException() {
+//        Book mockBook = mock(Book.class);
+//        when(mockBook.getISBN()).thenReturn("9781501110368");
+//        when(mockBook.getTitle()).thenReturn("It ends with us");
+//        when(mockBook.getAuthor()).thenReturn("1Coleen Hoover");
+//        IllegalArgumentException thrown = assertThrows(IllegalArgumentException.class, () -> {
+//            library.addBook(mockBook);
+//        });
+//
+//        assertEquals("Invalid author.", thrown.getMessage());
+//        verify(mockBook, never()).isBorrowed();
+//        verify(mockDatabaseService, never()).getBookByISBN(anyString());
+//        verify(mockDatabaseService, never()).addBook(anyString(), eq(mockBook));
+//    }
 
     @Test
     public void givenBookIsBorrowed_whenAddBook_thenIllegalArgumentException() {
@@ -499,6 +532,39 @@ public class TestLibrary {
         verify(mockReviewService).close();
         verify(mockUser, times(1)).sendNotification(notificationMessage);
     }
+
+//    @Test
+//    public void givenSendNotificationsFails1Times_whenNotifyUserWithBookReviews_thenUserNotified() {
+//        String ISBN = "9781501110368";
+//        String userId = "102030405060";
+//        Book mockBook = mock(Book.class);
+//        when(mockBook.getTitle()).thenReturn("It ends with us");
+//        User mockUser = mock(User.class);
+//        when(mockDatabaseService.getBookByISBN(ISBN)).thenReturn(mockBook);
+//        when(mockDatabaseService.getUserById(userId)).thenReturn(mockUser);
+//
+//        List<String> mockReviews = new ArrayList<>();
+//        List<String> spyReviews = spy(mockReviews);
+//        spyReviews.add("This book is exceptional! I loved it so much!");
+//
+//        when(mockReviewService.getReviewsForBook(ISBN)).thenReturn(spyReviews);
+//        String notificationMessage = "Reviews for 'It ends with us':\nThis book is exceptional! I loved it so much!";
+//
+//        System.out.print("***********!!");
+//        // Throw exception first time
+//        doThrow(new NotificationException("Something went wrong with sending the Notification!"))
+//                .when(mockUser).sendNotification(notificationMessage);
+//
+//        // Do nothing second time (it will succeed)
+//        doNothing().when(mockUser).sendNotification(notificationMessage);
+//
+//        assertDoesNotThrow(() -> library.notifyUserWithBookReviews(ISBN, userId));
+//
+////        verify(mockReviewService).close();
+//        verify(mockUser, times(2)).sendNotification(notificationMessage);
+//        System.out.print("***********&&");
+//    }
+
 
     @Test
     public void givenNullUserId_whenNotifyUserWithBookReviews_thenIllegalArgumentException() {
