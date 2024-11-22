@@ -145,22 +145,6 @@ public class TestLibrary {
         verify(mockDatabaseService, never()).addBook(anyString(), eq(mockBook));
     }
 
-//    @Test
-//    public void givenAuthorNameWithNumbersInvalid_whenAddBook_thenIllegalArgumentException() {
-//        Book mockBook = mock(Book.class);
-//        when(mockBook.getISBN()).thenReturn("9781501110368");
-//        when(mockBook.getTitle()).thenReturn("It ends with us");
-//        when(mockBook.getAuthor()).thenReturn("1Coleen Hoover");
-//        IllegalArgumentException thrown = assertThrows(IllegalArgumentException.class, () -> {
-//            library.addBook(mockBook);
-//        });
-//
-//        assertEquals("Invalid author.", thrown.getMessage());
-//        verify(mockBook, never()).isBorrowed();
-//        verify(mockDatabaseService, never()).getBookByISBN(anyString());
-//        verify(mockDatabaseService, never()).addBook(anyString(), eq(mockBook));
-//    }
-
     @Test
     public void givenBookIsBorrowed_whenAddBook_thenIllegalArgumentException() {
         Book mockBook = mock(Book.class);
@@ -694,7 +678,6 @@ public class TestLibrary {
         assertEquals("No reviews found!", thrown.getMessage());
         verify(mockReviewService).close();
         verify(mockUser, never()).sendNotification(anyString());
-
     }
 
 
